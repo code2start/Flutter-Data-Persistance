@@ -1,3 +1,5 @@
+import 'package:datapersistence/dbhelper.dart';
+import 'package:datapersistence/model/course.dart';
 import 'package:datapersistence/pages/newcourse.dart';
 import 'package:flutter/material.dart';
 
@@ -7,6 +9,12 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  DbHelper helper;
+  @override
+  void initState() {
+    super.initState();
+    helper = DbHelper();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,7 +27,31 @@ class _HomeState extends State<Home> {
           )
         ],
       ),
-      body: null,
+      body: FutureBuilder(
+        future: helper.allCourses(),
+        builder: (context, AsyncSnapshot snapshot){
+
+          if(!snapshot.hasData){
+            return Center(child: CircularProgressIndicator(),);
+          }else{
+            return ListView.builder(
+                itemCount: snapshot.data.length,
+                itemBuilder:  (context, i){
+                  Course course = Course.fromMap(snapshot.data[i]);
+                  return Card(
+                    child: ListTile(
+                      title: Text('${course.name} - ${course.hours} Hours'),
+                      subtitle: Text(course.content),
+                      trailing: IconButton(icon: Icon(Icons.delete,color: Colors.red,),onPressed: (){},),
+                    ),
+                  );
+
+
+                }
+            );
+          }
+        },
+      ),
     );
   }
 }

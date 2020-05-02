@@ -1,3 +1,5 @@
+import 'package:datapersistence/dbhelper.dart';
+import 'package:datapersistence/model/course.dart';
 import 'package:flutter/material.dart';
 
 class NewCourse extends StatefulWidget {
@@ -8,6 +10,12 @@ class NewCourse extends StatefulWidget {
 class _NewCourseState extends State<NewCourse> {
   String name, content;
   int hours;
+  DbHelper helper;
+  @override
+  void initState() {
+    super.initState();
+    helper = DbHelper();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,8 +62,10 @@ class _NewCourseState extends State<NewCourse> {
               SizedBox(height: 15,),
               RaisedButton(
                 child: Text('Save'),
-                onPressed: (){
-
+                onPressed: () async{
+                  var course = Course({'name':name,'content':content,'hours':hours});
+                  int id = await helper.createCourse(course);
+                  print('course id is $id');
                 },
               )
             ],
