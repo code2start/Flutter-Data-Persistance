@@ -11,6 +11,7 @@ class _NewCourseState extends State<NewCourse> {
   String name, content;
   int hours;
   DbHelper helper;
+
   @override
   void initState() {
     super.initState();
@@ -63,9 +64,9 @@ class _NewCourseState extends State<NewCourse> {
               RaisedButton(
                 child: Text('Save'),
                 onPressed: () async{
-                  var course = Course({'name':name,'content':content,'hours':hours});
+                  Course course = Course({'name':name,'content':content,'hours':hours});
                   int id = await helper.createCourse(course);
-                  print('course id is $id');
+                  Navigator.of(context).pop();
                 },
               )
             ],
