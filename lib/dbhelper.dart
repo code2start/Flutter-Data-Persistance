@@ -15,10 +15,14 @@ class DbHelper{
     }
     //define the path to the database
     String path = join(await getDatabasesPath(), 'school.db');
-    _db = await openDatabase(path,version: 1, onCreate: (Database db, int v){
+    _db = await openDatabase(path,version: 2, onCreate: (Database db, int v){
       //create tables
       db.execute('create table courses(id integer primary key autoincrement, name varchar(50), content varchar(255), hours integer)');
 
+    },onUpgrade: (Database db, int oldV, int newV) async{
+      if(oldV < newV) {
+        await db.execute("alter table courses add column level varchar(50) ");
+      }
     });
     return _db;
   }
@@ -37,7 +41,7 @@ class DbHelper{
      Database db = await createDatabase();
      return db.delete('courses', where: 'id = ?', whereArgs: [id]);
    }
-   Future<int> updateCourse(Course course) async{
+   Future<int> courseUpdate(Course course) async{
      Database db = await createDatabase();
      return await db.update('courses', course.toMap(),where: 'id = ?', whereArgs: [course.id]);
    }

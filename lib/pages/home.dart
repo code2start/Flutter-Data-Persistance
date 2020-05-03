@@ -1,8 +1,8 @@
 import 'package:datapersistence/dbhelper.dart';
 import 'package:datapersistence/model/course.dart';
 import 'package:datapersistence/pages/coursedetails.dart';
+import 'package:datapersistence/pages/courseupdate.dart';
 import 'package:datapersistence/pages/newcourse.dart';
-import 'package:datapersistence/pages/updatecourse.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatefulWidget {
@@ -45,28 +45,32 @@ class _HomeState extends State<Home> {
                 itemCount: snapshot.data.length,
                 itemBuilder: (context, i){
                   Course course = Course.fromMap(snapshot.data[i]);
-                  return ListTile(
-                    title: Text('${course.name} - ${course.hours} hours'),
-                    subtitle: Text(course.content.substring(0,100)),
-                    trailing: Column(
-                      children: <Widget>[
-                        Expanded(
-                          child: IconButton(icon: Icon(Icons.delete, color: Colors.red,),onPressed: (){
-                            setState(() {
-                              helper.delete(course.id);
-                            });
-                          },),
-                        ),
-                        Expanded(
-                          child: IconButton(icon: Icon(Icons.edit, color: Colors.green,),onPressed: (){
-                            Navigator.of(context).push(MaterialPageRoute(builder: (context)=>UpdateCourse(course)));
-                          },),
-                        ),
-                      ],
+                  return Card(
+                    margin: EdgeInsets.all(8),
+                    child: ListTile(
+                      title: Text('${course.name} - ${course.hours} hours - ${course.level}'),
+                      subtitle: Text(course.content.substring(0,200)),
+                      trailing:Column(
+                        children: <Widget>[
+                          Expanded(
+                            child: IconButton(icon: Icon(Icons.delete, color: Colors.red,),onPressed: (){
+                              setState(() {
+                                helper.delete(course.id);
+                              });
+                            },),
+                          ),
+                          Expanded(
+                            child: IconButton(icon: Icon(Icons.edit, color: Colors.green,),onPressed: (){
+                                Navigator.of(context).push(MaterialPageRoute(builder: (context)=>CourseUpdate(course)));
+                            },),
+                          ),
+                        ],
+                      ),
+                      onTap: (){
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context)=>CourseDetails(course)));
+                      },
                     ),
-                    onTap: (){
-                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => CourseDetails(course)));
-                    },
                   );
                 }
             );

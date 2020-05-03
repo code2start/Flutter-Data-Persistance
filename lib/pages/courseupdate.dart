@@ -2,20 +2,22 @@ import 'package:datapersistence/dbhelper.dart';
 import 'package:datapersistence/model/course.dart';
 import 'package:flutter/material.dart';
 
-class UpdateCourse extends StatefulWidget {
+class CourseUpdate extends StatefulWidget {
   Course course;
-  UpdateCourse(this.course);
-
+  CourseUpdate(this.course);
 
   @override
-  _UpdateCourseState createState() => _UpdateCourseState();
+  _CourseUpdateState createState() => _CourseUpdateState();
+
 }
 
-class _UpdateCourseState extends State<UpdateCourse> {
+class _CourseUpdateState extends State<CourseUpdate> {
   TextEditingController teName = TextEditingController();
   TextEditingController teContent = TextEditingController();
   TextEditingController teHours = TextEditingController();
+  TextEditingController teLevel = TextEditingController();
   DbHelper helper;
+
   @override
   void initState() {
     super.initState();
@@ -23,11 +25,12 @@ class _UpdateCourseState extends State<UpdateCourse> {
     teName.text = widget.course.name;
     teContent.text = widget.course.content;
     teHours.text = widget.course.hours.toString();
+    teLevel.text = widget.course.level;
   }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Update Course'),),
+      appBar: AppBar(title: Text('Course Update'),),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: ListView(
@@ -35,20 +38,22 @@ class _UpdateCourseState extends State<UpdateCourse> {
             TextField(controller: teName,),
             TextField(maxLines: null,controller: teContent,),
             TextField(controller: teHours,),
+            TextField(controller: teLevel,),
             RaisedButton(child: Text('Save'),onPressed: (){
               var updatedCourse = Course({
-                'id': widget.course.id,
-                'name': teName.text,
-                'content':teContent.text,
+                'id' : widget.course.id,
+                'name' : teName.text,
+                'content' : teContent.text,
                 'hours' : int.parse(teHours.text),
+                'level' : teLevel.text,
               });
-              helper.updateCourse(updatedCourse);
+
+              helper.courseUpdate(updatedCourse);
               Navigator.of(context).pop();
             },),
           ],
         ),
-        ),
-
+      ),
     );
   }
 }
