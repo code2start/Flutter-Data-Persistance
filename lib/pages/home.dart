@@ -3,6 +3,7 @@ import 'package:datapersistence/model/course.dart';
 import 'package:datapersistence/pages/coursedetails.dart';
 import 'package:datapersistence/pages/courseupdate.dart';
 import 'package:datapersistence/pages/newcourse.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatefulWidget {
@@ -14,13 +15,44 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   DbHelper helper;
-
+  TextEditingController teSeach = TextEditingController();
+  var allCourses = [];
+  var items = List();
 
 
  @override
   void initState() {
     super.initState();
     helper = DbHelper();
+    helper.allCourses().then((courses){
+      setState(() {
+        allCourses = courses;
+        items = allCourses;
+      });
+    });
+  }
+
+  void filterSeach(String query) async{
+   var dummySearchList = allCourses;
+   if(query.isNotEmpty){
+     var dummyListData = List();
+     dummySearchList.forEach((item){
+       var course = Course.fromMap(item);
+       if(course.name.toLowerCase().contains(query.toLowerCase())){
+         dummyListData.add(item);
+       }
+     });
+     setState(() {
+      items = [];
+      items.addAll(dummyListData);
+     });
+     return;
+   }else{
+    setState(() {
+      items = [];
+      items = allCourses;
+    });
+   }
   }
 
   @override
@@ -35,16 +67,32 @@ class _HomeState extends State<Home> {
           )
         ],
       ),
-      body: FutureBuilder(
-        future: helper.allCourses(),
-        builder: (context, AsyncSnapshot snapshot){
-          if(!snapshot.hasData){
-            return CircularProgressIndicator();
-          }else{
-            return ListView.builder(
-                itemCount: snapshot.data.length,
+      body: Column(
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: TextField(
+              onChanged: (value){
+                setState(() {
+                  filterSeach(value);
+                });
+              },
+              controller: teSeach,
+              decoration: InputDecoration(
+                hintText: 'Search...',
+                labelText: 'Search',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(25)),
+                )
+              ),
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+                itemCount: items.length,
                 itemBuilder: (context, i){
-                  Course course = Course.fromMap(snapshot.data[i]);
+                  Course course = Course.fromMap(items[i]);
                   return Card(
                     margin: EdgeInsets.all(8),
                     child: ListTile(
@@ -61,8 +109,9 @@ class _HomeState extends State<Home> {
                           ),
                           Expanded(
                             child: IconButton(icon: Icon(Icons.edit, color: Colors.green,),onPressed: (){
-                                Navigator.of(context).push(MaterialPageRoute(builder: (context)=>CourseUpdate(course)));
+                              Navigator.of(context).push(MaterialPageRoute(builder: (context)=>CourseUpdate(course)));
                             },),
+
                           ),
                         ],
                       ),
@@ -73,9 +122,9 @@ class _HomeState extends State<Home> {
                     ),
                   );
                 }
-            );
-          }
-        },
+            ),
+          ),
+        ],
       ),
     );
   }
